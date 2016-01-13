@@ -48,25 +48,17 @@ ifeq (${shell uname}, Darwin)
  CC			= clang
  AVR 		= avr-
  AVR_INC 	:= ${dir ${shell ${AVR}gcc -print-file-name=libc.a}}..
- # test for MacPorts libelf
- ifeq (${shell test -d /opt/local && echo Exists}, Exists)
-  ifneq (${shell test -d /opt/local/include/libelf && echo Exists}, Exists)
-   $(error Please install libelf: port install libelf)
-  endif
-  IPATH		+= /opt/local/include /opt/local/include/libelf
-  LFLAGS	= -L/opt/local/lib/
- else
-  # test for Homebrew libelf
-  HOMEBREW_PREFIX ?= /usr/local
-  ifeq (${shell test -d $(HOMEBREW_PREFIX)/Cellar && echo Exists}, Exists)
-   ifneq (${shell test -d $(HOMEBREW_PREFIX)/Cellar/libelf/ && echo Exists}, Exists)
-    $(error Please install libelf: brew install libelf)
-   endif
-   IPATH		+= $(HOMEBREW_PREFIX)/include
-   LFLAGS		= -L$(HOMEBREW_PREFIX)/lib/
-   CFLAGS		+= -I/$(HOMEBREW_PREFIX)/include/libelf
-  endif
+ # check for libelf
+ HOMEBREW_PREFIX ?= /usr/local
+ MACPORTS_PREFIX ?= /opt/local
+ LIBELF_PREFIXES := $(HOMEBREW_PREFIX) $(MACPORTS_PREFIX)
+ LIBELF_PREFIX := ${firstword ${foreach prefix,${LIBELF_PREFIXES},\
+                    ${if ${wildcard ${prefix}/include/libelf},${prefix}}}}
+ ifeq (${LIBELF_PREFIX},)
+  ${error libelf is required}
  endif
+ IPATH		+= ${LIBELF_PREFIX}/include ${LIBELF_PREFIX}/include/libelf
+ LFLAGS		= -L${LIBELF_PREFIX}/lib
 else
  LINUX_AVR_ROOTS := /usr/lib/avr /usr/avr /opt/cross/avr/avr /usr/local/avr
  AVR_ROOT := $(firstword $(wildcard $(LINUX_AVR_ROOTS)))
