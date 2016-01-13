@@ -43,11 +43,13 @@ CFLAGS		+= -O2 -Wall
 CFLAGS		+= -g
 CORE_CFLAGS	= -nostdinc -DAVR_CORE=1
 
+# find avr-gcc on PATH by default, and use it to find avr-libc
+AVR 		= avr-
+AVR_INC 	:= ${dir ${shell ${AVR}gcc -print-file-name=libc.a}}..
+
 ifeq (${shell uname}, Darwin)
  # gcc 4.2 from MacOS is really not up to scratch anymore 
  CC			= clang
- AVR 		= avr-
- AVR_INC 	:= ${dir ${shell ${AVR}gcc -print-file-name=libc.a}}..
  # check for libelf
  HOMEBREW_PREFIX ?= /usr/local
  MACPORTS_PREFIX ?= /opt/local
@@ -59,14 +61,6 @@ ifeq (${shell uname}, Darwin)
  endif
  IPATH		+= ${LIBELF_PREFIX}/include ${LIBELF_PREFIX}/include/libelf
  LFLAGS		= -L${LIBELF_PREFIX}/lib
-else
- LINUX_AVR_ROOTS := /usr/lib/avr /usr/avr /opt/cross/avr/avr /usr/local/avr
- AVR_ROOT := $(firstword $(wildcard $(LINUX_AVR_ROOTS)))
- ifeq (${AVR_ROOT},)
-  $(error No avr-libc root directory found. Tried the following paths: $(LINUX_AVR_ROOTS))
- endif
- AVR_INC 	:= ${AVR_ROOT}
- AVR 		:= avr-
 endif
 
 # FIXME uname -o doesn't work on bsd derivatives
