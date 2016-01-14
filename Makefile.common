@@ -44,8 +44,8 @@ CFLAGS		+= -g
 CORE_CFLAGS	= -nostdinc -DAVR_CORE=1
 
 # find avr-gcc on PATH by default, and use it to find avr-libc
-AVR 		= avr-
-AVR_INC 	:= ${dir ${shell ${AVR}gcc -print-file-name=libc.a}}..
+AVR			= avr-
+AVR_INC		:= ${patsubst %/lib/libc.a,%,${wildcard ${shell ${AVR}gcc -print-file-name=libc.a}}}
 
 ifeq (${shell uname}, Darwin)
  # gcc 4.2 from MacOS is really not up to scratch anymore 
