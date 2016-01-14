@@ -58,7 +58,7 @@ ifeq (${shell uname}, Darwin)
   ${error libelf is required}
  endif
  IPATH		+= ${LIBELF_PREFIX}/include ${LIBELF_PREFIX}/include/libelf
- LFLAGS		= -L${LIBELF_PREFIX}/lib
+ LDFLAGS	+= -L${LIBELF_PREFIX}/lib
 endif
 
 # FIXME uname -o doesn't work on bsd derivatives
@@ -102,10 +102,10 @@ ifeq (${shell uname}, Linux)
 ifeq ($(RELEASE),1)
 # allow the shared library to be found in the build directory
 # only for linking, the install time location is used at runtime
-LFLAGS		+= -Wl,-rpath-link,${LIBDIR}
+LDFLAGS		+= -Wl,-rpath-link,${LIBDIR}
 else
 # allow the shared library to be found in the build directory
-LFLAGS		+= -Wl,-rpath,${LIBDIR}
+LDFLAGS		+= -Wl,-rpath,${LIBDIR}
 endif
 endif
 
@@ -161,10 +161,10 @@ endif
 
 ${OBJ}/%.elf:
 ifeq ($(V),1)
-	$(CC) -MMD ${CFLAGS}  ${LFLAGS} -o $@ $^ $(LDFLAGS)
+	$(CC) -MMD ${CFLAGS} ${LDFLAGS} -o $@ $^
 else
 	@echo LD $@
-	@$(CC) -MMD ${CFLAGS}  ${LFLAGS} -o $@ $^ $(LDFLAGS)
+	@$(CC) -MMD ${CFLAGS} ${LDFLAGS} -o $@ $^
 endif
 
 obj: ${OBJ}
