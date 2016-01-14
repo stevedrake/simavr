@@ -47,20 +47,6 @@ CORE_CFLAGS	= -nostdinc -DAVR_CORE=1
 AVR			= avr-
 AVR_INC		:= ${patsubst %/lib/libc.a,%,${wildcard ${shell ${AVR}gcc -print-file-name=libc.a}}}
 
-ifeq (${shell uname}, Darwin)
- # check for libelf
- HOMEBREW_PREFIX ?= /usr/local
- MACPORTS_PREFIX ?= /opt/local
- LIBELF_PREFIXES := $(HOMEBREW_PREFIX) $(MACPORTS_PREFIX)
- LIBELF_PREFIX := ${firstword ${foreach prefix,${LIBELF_PREFIXES},\
-                    ${if ${wildcard ${prefix}/include/libelf},${prefix}}}}
- ifeq (${LIBELF_PREFIX},)
-  ${error libelf is required}
- endif
- IPATH		+= ${LIBELF_PREFIX}/include ${LIBELF_PREFIX}/include/libelf
- LDFLAGS	+= -L${LIBELF_PREFIX}/lib
-endif
-
 # FIXME uname -o doesn't work on bsd derivatives
 #WIN := ${shell uname -o}
 
@@ -92,7 +78,8 @@ OBJ 		:= obj-${shell $(CC) -dumpmachine}
 LIBDIR		:= ${shell pwd}/${SIMAVR}/${OBJ}
 LDFLAGS 	+= -L${LIBDIR} -lsimavr 
 
-LDFLAGS 	+= -lelf 
+CPPFLAGS	+= ${shell pkg-config --cflags libelf}
+LDFLAGS		+= ${shell pkg-config --libs libelf}
 
 ifeq (${WIN}, Msys)
 LDFLAGS      += -lws2_32
