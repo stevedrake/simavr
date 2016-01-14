@@ -48,8 +48,6 @@ AVR			= avr-
 AVR_INC		:= ${patsubst %/lib/libc.a,%,${wildcard ${shell ${AVR}gcc -print-file-name=libc.a}}}
 
 ifeq (${shell uname}, Darwin)
- # gcc 4.2 from MacOS is really not up to scratch anymore 
- CC			= clang
  # check for libelf
  HOMEBREW_PREFIX ?= /usr/local
  MACPORTS_PREFIX ?= /opt/local
